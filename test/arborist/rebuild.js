@@ -342,5 +342,5 @@ t.test('rebuild node-gyp dependencies lacking both preinstall and install script
   const arb = newArb({ path })
   await arb.loadActual()
   await arb.rebuild()
-  t.ok(fs.existsSync(path + '/node_modules/node-report/build/Release/api.node'))
+  t.ok(fs.existsSync(path + '/node_modules/node-gyp-hello-world/build/Release/greet.node'))
 })

@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-report": "2.2.11"
+    "node-gyp-hello-world": "1.0.0"
   }
 }
