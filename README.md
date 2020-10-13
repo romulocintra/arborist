@@ -1,3 +1,5 @@
+# Default branch renamed from 'master' to 'main'
+
 We've renamed the default branch from 'master' to 'main'.
 
 This is less evocative of a problematic history of human slavery and
