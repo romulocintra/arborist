@@ -5,8 +5,22 @@ const requireInject = require('require-inject')
 const Link = require('../lib/link.js')
 const Shrinkwrap = require('../lib/shrinkwrap.js')
 
+const normalizePath = path => path.replace(/^[A-Z]:/, '').replace(/\\/g, '/')
+const normalizePaths = obj => {
+  for (const key in obj) {
+    if (key === 'path') {
+      obj[key] = normalizePath(obj[key])
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      obj[key] = normalizePaths(obj[key])
+    }
+  }
+  return obj
+}
+
 t.cleanSnapshot = str =>
-  str.split(process.cwd()).join('{CWD}').replace('\\', '/')
+  str.split(process.cwd()).join('{CWD}')
+  .replace(/[A-Z]:/g, '')
+  .replace(/\\\\?/g, '/')
 
 t.test('basic instantiation', t => {
   const root = new Node({
@@ -413,8 +427,8 @@ t.test('load with a virtual filesystem parent', t => {
   t.equal(target3.path, root.realpath + '/packages/link3')
   // now move it
   packages.fsParent = link.target
-  t.equal(packages.path, root.realpath + '/link-target/packages')
-  t.equal(target3.path, root.realpath + '/link-target/packages/link3')
+  t.equal(normalizePath(packages.path), root.realpath + '/link-target/packages')
+  t.equal(normalizePath(target3.path), root.realpath + '/link-target/packages/link3')
   t.equal(link3.realpath, target3.path, 'link realpath updated')
 
   // can't set fsParent to a link!
@@ -1569,7 +1583,7 @@ t.test('explain yourself', t => {
     })
 
     const edge = virtual.children.get('c').edgesOut.get('d')
-    t.strictSame(virtual.children.get('d').explain(edge), {
+    t.strictSame(normalizePaths(virtual.children.get('d').explain(edge)), {
       name: 'd',
       version: '1.2.3',
       whileInstalling: {
