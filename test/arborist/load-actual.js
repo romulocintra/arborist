@@ -15,12 +15,13 @@ const {
 
 // little helper functions to make the loaded trees
 // easier to look at in the snapshot results.
-const pp = path => path && path.substr(fixtures.length + 1).replace(/\\/g, '/')
+const pp = path => path && normalizePath(path.substr(fixtures.length + 1))
+const normalizePath = path => path.replace(/[A-Z]:/, '').replace(/\\/g, '/')
 
 const printEdge = (edge, inout) => ({
   name: edge.name,
   type: edge.type,
-  spec: edge.spec,
+  spec: normalizePath(edge.spec),
   ...(inout === 'in' ? {
     from: edge.from && pp(edge.from.realpath),
   } : {
@@ -55,7 +56,7 @@ const printTree = tree => ({
           message: error.message,
           stack: ('' + error.stack).split('\n'),
         }),
-        ...(error.path ? { path: relative(__dirname, error.path) }
+        ...(error.path ? { path: normalizePath(relative(__dirname, error.path)) }
           : {}),
       })),
     } : {}),
@@ -96,7 +97,7 @@ const printTree = tree => ({
   })
 })
 
-const cwd = process.cwd()
+const cwd = normalizePath(process.cwd())
 t.cleanSnapshot = s => s.split(cwd).join('{CWD}')
 
 t.formatSnapshot = tree => format(printTree(tree), { sort: true })
