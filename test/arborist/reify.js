@@ -163,7 +163,8 @@ t.test('tarball deps with transitive tarball deps', t =>
 
 t.test('update a yarn.lock file', async t => {
   const path = fixture(t, 'yarn-lock-mkdirp')
-  t.matchSnapshot(await reify(path, { add: ['abbrev'] }), 'add abbrev')
+  const tree = await reify(path, { add: ['abbrev'] })
+  t.matchSnapshot(printTree(tree), 'add abbrev')
   t.matchSnapshot(fs.readFileSync(path + '/yarn.lock', 'utf8'), 'updated yarn lock')
 })
 
