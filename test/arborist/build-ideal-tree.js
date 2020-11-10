@@ -23,6 +23,17 @@ const warningTracker = () => {
 }
 
 const normalizePath = path => path.replace(/[A-Z]:/, '').replace(/\\/g, '/')
+const normalizePaths = obj => {
+  for (const key in obj) {
+    if (key === 'location') {
+      obj[key] = normalizePath(obj[key])
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      obj[key] = normalizePaths(obj[key])
+    }
+  }
+  return obj
+}
+
 // two little helper functions to make the loaded trees
 // easier to look at in the snapshot results.
 const printEdge = (edge, inout) => ({
@@ -1741,7 +1752,7 @@ t.test('more peer dep conflicts', t => {
         info: () => {},
         notice: () => {},
         error: () => {},
-        warn: (...msg) => warnings.push(typeof msg === 'string' ? normalizePath(msg) : msg),
+        warn: (...msg) => warnings.push(normalizePaths(msg)),
       }
       const strict = new Arborist({ ...OPT, path, strictPeerDeps: true })
       const force = new Arborist({ ...OPT, path, force: true })
