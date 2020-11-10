@@ -22,12 +22,13 @@ const warningTracker = () => {
   }
 }
 
+const normalizePath = path => path.replace(/[A-Z]:/, '').replace(/\\/g, '/')
 // two little helper functions to make the loaded trees
 // easier to look at in the snapshot results.
 const printEdge = (edge, inout) => ({
   name: edge.name,
   type: edge.type,
-  spec: edge.spec,
+  spec: normalizePath(edge.spec),
   ...(inout === 'in' ? {
     from: edge.from && edge.from.location,
   } : {
@@ -40,7 +41,7 @@ const printEdge = (edge, inout) => ({
 const printTree = tree => ({
   name: tree.name,
   location: tree.location,
-  resolved: tree.resolved,
+  resolved: tree.resolved && normalizePath(tree.resolved),
   // 'package': tree.package,
   ...(tree.extraneous ? { extraneous: true } : {
     ...(tree.dev ? { dev: true } : {}),
@@ -79,7 +80,7 @@ const printTree = tree => ({
   } : {}),
   ...(!tree.fsChildren.size ? {} : {
     fsChildren: new Set([...tree.fsChildren]
-      .sort((a, b) => a.path.localeCompare(b.path))
+      .sort((a, b) => normalizePath(a.path).localeCompare(normalizePath(b.path)))
       .map(tree => printTree(tree))),
   }),
   ...(tree.target || !tree.children.size ? {}
@@ -91,7 +92,7 @@ const printTree = tree => ({
   __proto__: { constructor: tree.constructor },
 })
 
-const cwd = process.cwd()
+const cwd = normalizePath(process.cwd())
 t.cleanSnapshot = s => s.split(cwd).join('{CWD}')
   .split(registry).join('https://registry.npmjs.org/')
 
@@ -144,7 +145,7 @@ t.test('warn on mismatched engine when engineStrict is false', t => {
   ]))
 })
 
-t.test('fail on mismatched platform', async t => {
+t.test('fail on mismatched platform', { skip: process.platform === 'win32' && '*nix specific test' }, async t => {
   const path = resolve(fixtures, 'platform-specification')
   t.rejects(buildIdeal(path, {
     ...OPT,
@@ -1337,7 +1338,7 @@ t.test('resolve file deps from cwd', t => {
     global: true,
   }).then(tree => {
     const resolved = `file:${resolve(fixturedir, 'child-1.2.3.tgz')}`
-    t.equal(tree.children.get('child').resolved, resolved)
+    t.equal(normalizePath(tree.children.get('child').resolved), normalizePath(resolved))
   })
 })
 
@@ -1740,7 +1741,7 @@ t.test('more peer dep conflicts', t => {
         info: () => {},
         notice: () => {},
         error: () => {},
-        warn: (...msg) => warnings.push(msg),
+        warn: (...msg) => warnings.push(typeof msg === 'string' ? normalizePath(msg) : msg),
       }
       const strict = new Arborist({ ...OPT, path, strictPeerDeps: true })
       const force = new Arborist({ ...OPT, path, force: true })
