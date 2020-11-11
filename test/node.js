@@ -897,30 +897,39 @@ t.test('binPaths, but global', t => {
   const { resolve: r } = require('path')
 
   t.strictSame(root.binPaths, [])
-  t.strictSame(link.binPaths, [
-    r('/usr/local/bin/d'),
-    ...(process.platform !== 'win32' ? [] : [
-      r('/usr/local/bin/d.cmd'),
-      r('/usr/local/bin/d.ps1'),
-    ]),
-  ])
+  t.strictSame(link.binPaths, process.platform === 'win32'
+    ? [
+      r('/usr/local/lib/d'),
+      r('/usr/local/lib/d.cmd'),
+      r('/usr/local/lib/d.ps1'),
+    ]
+    : [
+      r('/usr/local/bin/d'),
+    ]
+  )
   t.strictSame(link.target.binPaths, [])
   const scoped = root.children.get('@foo/bar')
-  t.strictSame(scoped.binPaths, [
-    r('/usr/local/bin/bar'),
-    ...(process.platform !== 'win32' ? [] : [
-      r('/usr/local/bin/bar.cmd'),
-      r('/usr/local/bin/bar.ps1'),
-    ]),
-  ])
+  t.strictSame(scoped.binPaths, process.platform === 'win32'
+    ? [
+      r('/usr/local/lib/bar'),
+      r('/usr/local/lib/bar.cmd'),
+      r('/usr/local/lib/bar.ps1'),
+    ]
+    : [
+      r('/usr/local/bin/bar'),
+    ]
+  )
   const unscoped = root.children.get('foo')
-  t.strictSame(unscoped.binPaths, [
-    r('/usr/local/bin/foo'),
-    ...(process.platform !== 'win32' ? [] : [
-      r('/usr/local/bin/foo.cmd'),
-      r('/usr/local/bin/foo.ps1'),
-    ]),
-  ])
+  t.strictSame(unscoped.binPaths, process.platform === 'win32'
+    ? [
+      r('/usr/local/lib/foo'),
+      r('/usr/local/lib/foo.cmd'),
+      r('/usr/local/lib/foo.ps1'),
+    ]
+    : [
+      r('/usr/local/bin/foo'),
+    ]
+  )
   const nested = unscoped.children.get('bar')
   t.strictSame(nested.binPaths, [
     r('/usr/local/lib/node_modules/foo/node_modules/.bin/bar'),
