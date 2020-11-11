@@ -5,12 +5,12 @@ const Shrinkwrap = require('../lib/shrinkwrap.js')
 
 const normalizePath = path => path.replace(/^[A-Z]:/, '').replace(/\\/g, '/')
 const normalizePaths = obj => {
-  for (const key in obj) {
-    if (['path', 'realpath'].includes(key)) {
-      obj[key] = normalizePath(obj[key])
-    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-      obj[key] = normalizePaths(obj[key])
-    }
+  obj.path = obj.path && normalizePath(obj.path)
+  obj.realpath = obj.realpath && normalizePath(obj.realpath)
+  for (const key of obj.inventory.keys()) {
+    const member = obj.inventory.get(key)
+    member.path = member.path && normalizePath(member.path)
+    member.realpath = member.realpath && normalizePath(member.realpath)
   }
   return obj
 }
