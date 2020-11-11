@@ -8,7 +8,7 @@ const Shrinkwrap = require('../lib/shrinkwrap.js')
 const normalizePath = path => path.replace(/^[A-Z]:/, '').replace(/\\/g, '/')
 const normalizePaths = obj => {
   for (const key in obj) {
-    if (key === 'path') {
+    if (['path', 'location'].includes(key)) {
       obj[key] = normalizePath(obj[key])
     } else if (typeof obj[key] === 'object' && obj[key] !== null) {
       obj[key] = normalizePaths(obj[key])
@@ -424,11 +424,11 @@ t.test('load with a virtual filesystem parent', t => {
   // set initially
   packages.fsParent = root
   // XXX probably broken test on Windows
-  t.equal(target3.path, root.realpath + '/packages/link3')
+  t.equal(normalizePath(target3.path), normalizePath(root.realpath) + '/packages/link3')
   // now move it
   packages.fsParent = link.target
-  t.equal(normalizePath(packages.path), root.realpath + '/link-target/packages')
-  t.equal(normalizePath(target3.path), root.realpath + '/link-target/packages/link3')
+  t.equal(normalizePath(packages.path), normalizePath(root.realpath) + '/link-target/packages')
+  t.equal(normalizePath(target3.path), normalizePath(root.realpath) + '/link-target/packages/link3')
   t.equal(link3.realpath, target3.path, 'link realpath updated')
 
   // can't set fsParent to a link!
@@ -632,14 +632,14 @@ t.test('check if a node is in a node_modules folder or not', t => {
     realpath: '/path/to/foo/node_modules/a',
     pkg: { name: 'a' },
   })
-  t.equal(a.inNodeModules(), '/path/to/foo', 'basic obvious case')
+  t.equal(normalizePath(a.inNodeModules()), '/path/to/foo', 'basic obvious case')
 
   const b = new Node({
     path: '/path/to/foo/node_modules/a',
     realpath: '/path/to/foo/node_modules/a',
     pkg: { name: 'b' },
   })
-  t.equal(b.inNodeModules(), '/path/to/foo', 'based on path name, not pkg name')
+  t.equal(normalizePath(b.inNodeModules()), '/path/to/foo', 'based on path name, not pkg name')
 
   const c = new Node({
     path: '/path/to/foo/node_modules/a/b/c',
@@ -653,7 +653,7 @@ t.test('check if a node is in a node_modules folder or not', t => {
     realpath: '/path/to/foo/node_modules/@c/d',
     pkg: { name: '@a/b/c/d/e' },
   })
-  t.equal(d.inNodeModules(), '/path/to/foo', 'scoped package in node_modules')
+  t.equal(normalizePath(d.inNodeModules()), '/path/to/foo', 'scoped package in node_modules')
 
   t.end()
 })
