@@ -1368,7 +1368,7 @@ t.test('explain yourself', t => {
   const n = new Node({ path: '/some/path', pkg: {
     dependencies: { x: '1', y: '2' },
   }})
-  t.strictSame(n.explain(), { location: '/some/path' })
+  t.strictSame(normalizePaths(n.explain()), { location: '/some/path' })
   t.equal(n.explain(), n.explain(), 'caches result')
   const x = new Node({ parent: n, pkg: { name: 'x', version: '1.2.3' }})
   t.strictSame(x.explain(), {
@@ -1496,7 +1496,7 @@ t.test('explain yourself', t => {
   })
 
   // explain a node with respect to a specific hypothetical edge
-  t.strictSame(b.explain(otherNode.edgesOut.get('b')), {
+  t.strictSame(normalizePaths(b.explain(otherNode.edgesOut.get('b'))), {
     name: 'b',
     version: '9.9.9',
     location: 'node_modules/b',
@@ -1521,7 +1521,7 @@ t.test('explain yourself', t => {
     ],
   })
 
-  t.strictSame(cycle.children.get('b').explain(), {
+  t.strictSame(normalizePaths(cycle.children.get('b').explain()), {
     name: 'b',
     version: '1.1.1',
     location: 'node_modules/b',
