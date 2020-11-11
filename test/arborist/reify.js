@@ -1117,7 +1117,7 @@ t.test('store files with a custom indenting', async t => {
     fs.readFileSync(
       resolve(__dirname, '../fixtures/tab-indented-package-json/package.json'),
       'utf8'
-    )
+    ).replace(/\r\n/g, '\n')
   const path = t.testdir({
     'package.json': tabIndentedPackageJson
   })
