@@ -1354,6 +1354,8 @@ t.test('resolve file deps from cwd', t => {
 })
 
 t.test('resolve links in global mode', t => {
+  const cwd = process.cwd()
+  t.teardown(() => process.chdir(cwd))
   const path = t.testdir({
     global: {},
     lib: {
@@ -1367,9 +1369,6 @@ t.test('resolve links in global mode', t => {
     },
   })
   const fixturedir = resolve(path, 'lib', 'my-project')
-
-  const cwd = process.cwd()
-  t.teardown(() => process.chdir(cwd))
   process.chdir(fixturedir)
 
   const arb = new Arborist({
