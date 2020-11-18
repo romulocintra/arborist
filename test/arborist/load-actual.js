@@ -269,25 +269,6 @@ t.test('load a global space with a filter', t =>
     filter: (parent, kid) => parent.parent || kid === 'semver'
   })))
 
-t.test('realpath gutchecks', t => {
-  // the realpath module is tested pretty thoroughly, but
-  // while we've got a bunch of symlinks being created, may as well
-  // give it a quick integration pass.
-  const d = resolve(__dirname, '../fixtures')
-  const realpath = require('../../lib/realpath.js')
-  Object.keys(symlinks).map(link => t.test(link, t =>
-    realpath(
-      resolve(d, link),
-      new Map(),
-      new Map(),
-      0
-    ).then(
-      real => t.equal(real, realpathSync(resolve(d, link))),
-      er => t.throws(()=> realpathSync(resolve(d, link)))
-    )))
-  t.end()
-})
-
 t.test('workspaces', t => {
   t.test('load a simple install tree containing workspaces', t =>
     t.resolveMatchSnapshot(
