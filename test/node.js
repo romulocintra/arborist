@@ -435,6 +435,7 @@ t.test('load with a virtual filesystem parent', t => {
     pkg: { name: 'link3', version: '1.2.3', dependencies: { link2: '' }},
     realpath: root.realpath + '/packages/link3',
     target: target3,
+    parent: root,
   })
   // set initially
   packages.fsParent = root
@@ -442,8 +443,9 @@ t.test('load with a virtual filesystem parent', t => {
   t.equal(normalizePath(target3.path), normalizePath(root.realpath) + '/packages/link3')
   // now move it
   packages.fsParent = link.target
-  t.equal(normalizePath(packages.path), normalizePath(root.realpath) + '/link-target/packages')
-  t.equal(normalizePath(target3.path), normalizePath(root.realpath) + '/link-target/packages/link3')
+  t.equal(normalizePath(packages.path), normalizePath(root.realpath + '/link-target/packages'))
+  t.equal(normalizePath(target3.path), normalizePath(root.realpath + '/link-target/packages/link3'))
+  t.equal(link3.target, target3, 'still targetting the right node')
   t.equal(link3.realpath, target3.path, 'link realpath updated')
 
   // can't set fsParent to a link!
@@ -1257,9 +1259,10 @@ t.test('detect that two nodes are the same thing', async t => {
   }
 
   {
-    const target = new Node({ path:'/foo', pkg:{name:'x', version:'1.2.3'}})
-    const a = new Link({ path: '/a/x', target: target })
-    const b = new Link({ path: '/b/x', target: target })
+    const root = new Node({ path: '/root' })
+    const target = new Node({ root, path:'/foo', pkg:{name:'x', version:'1.2.3'}})
+    const a = new Link({ root, path: '/a/x', target })
+    const b = new Link({ root, path: '/b/x', target })
     check(a, b, true, 'links match if targets match')
   }
 
@@ -1715,5 +1718,34 @@ t.test('guard against setting package to something improper', t => {
   } finally {
     t.strictSame(p.package, {})
   }
+  t.end()
+})
+
+t.test('clear inventory when changing root', t => {
+  const r1 = new Node({ path: '/root1' })
+  const r2 = new Node({ path: '/root2', children: [
+    { pkg: { name: 'foo', version: '1.2.3' } },
+  ]})
+  const r3 = new Node({ path: '/root3' })
+  const child3 = new Node({ path: '/root2/node_modules/foo',
+    pkg: { name: 'foo', version: '1.2.3' },
+    root: r3,
+  })
+  const child = r2.children.get('foo')
+  t.equal(r1.inventory.size, 0)
+  t.equal(r2.inventory.size, 1)
+  t.equal(r1.inventory.has(child), false)
+  t.equal(r2.inventory.has(child), true)
+  r2.root = r1
+  t.equal(r1.inventory.size, 2)
+  t.equal(r2.inventory.size, 0)
+  t.equal(r1.inventory.has(child), true)
+  t.equal(r2.inventory.has(child), false)
+  t.equal(r3.inventory.size, 1)
+  r3.root = r1
+  t.equal(r1.inventory.size, 3)
+  t.equal(r3.inventory.size, 0)
+  t.equal(r1.inventory.has(child3), false)
+  t.equal(child3.root, child3)
   t.end()
 })
