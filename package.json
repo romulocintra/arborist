@@ -25,7 +25,7 @@
     "promise-call-limit": "^1.0.1",
     "read-package-json-fast": "^1.2.1",
     "readdir-scoped-modules": "^1.1.0",
-    "semver": "^7.1.2",
+    "semver": "^7.3.4",
     "treeverse": "^1.0.4",
     "walk-up-path": "^1.0.0"
   },
