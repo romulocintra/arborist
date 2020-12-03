@@ -63,7 +63,7 @@ t.matchSnapshot(normalizePaths(new Link({
   target: root,
 })), 'instantiate with target specified')
 
-t.test('link.target setter', t => {
+t.test('link.target setter', async t => {
   const link = new Link({
     path: '/path/to/link',
     realpath: '/node-a',
@@ -98,8 +98,75 @@ t.test('link.target setter', t => {
     }))))
   link.target = laterTarget
   t.equal(link.target, laterTarget, 'waiting for a new target to resolve')
-  return laterTarget.then(node => {
-    t.equal(link.target, node, 'target resolved and assigned')
-    t.equal(link.package, node.package, 'took on new targets package')
+  t.throws(() => link.target = oldTarget, {
+    message: 'cannot set target while awaiting',
+    path: link.path,
+    realpath: link.realpath,
   })
+  const node = await laterTarget
+  t.equal(link.target, node, 'target resolved and assigned')
+  t.equal(link.package, node.package, 'took on new targets package')
+  t.equal(node.linksIn.has(link), true, 'link in node.linksIn')
+  link.target = null
+  t.equal(link.target, null, 'target is now null')
+  t.strictSame(link.package, {}, 'removed target, package is now empty')
+  // just test the guard that setting to a different falsey value is fine
+  link.target = undefined
+  t.equal(link.target, null, 'target is still null')
+  t.strictSame(link.package, {}, 'removed target, package is now empty')
+})
+
+t.test('get root from various places', t => {
+  const root = new Node({
+    path: '/path/to/root',
+  })
+
+  t.test('get from root', t => {
+    const fromRoot = new Link({
+      pkg: { name: 'from-root' },
+      path: '/path/to/root/from-root',
+      realpath: '/path/to/root/from-root-target',
+      root,
+    })
+    t.equal(fromRoot.root, root)
+    t.equal(fromRoot.fsParent, root)
+    t.equal(fromRoot.parent, null)
+    t.equal(fromRoot.target.root, root)
+    t.equal(fromRoot.target.fsParent, root)
+    t.equal(fromRoot.target.parent, null)
+    t.end()
+  })
+
+  t.test('get from fsParent', t => {
+    const fromFsParent = new Link({
+      pkg: { name: 'from-fs-parent' },
+      path: '/path/to/root/from-fs-parent',
+      realpath: '/path/to/root/from-root-fs-parent',
+      fsParent: root,
+    })
+    t.equal(fromFsParent.root, root)
+    t.equal(fromFsParent.fsParent, root)
+    t.equal(fromFsParent.parent, null)
+    t.equal(fromFsParent.target.root, root)
+    t.equal(fromFsParent.target.fsParent, root)
+    t.equal(fromFsParent.target.parent, null)
+    t.end()
+  })
+
+  t.test('get from parent', t => {
+    const fromParent = new Link({
+      pkg: { name: 'from-parent' },
+      parent: root,
+      realpath: '/path/to/root/from-root-parent',
+    })
+    t.equal(fromParent.root, root)
+    t.equal(fromParent.fsParent, null)
+    t.equal(fromParent.parent, root)
+    t.equal(fromParent.target.root, root)
+    t.equal(fromParent.target.fsParent, root)
+    t.equal(fromParent.target.parent, null)
+    t.end()
+  })
+
+  t.end()
 })

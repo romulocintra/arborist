@@ -340,3 +340,12 @@ t.test('omit options', async t => {
   }
   t.end()
 })
+
+t.test('audit when tree is empty', async t => {
+  const tree = new Node({
+    path: '/path/to/tree',
+  })
+  const auditReport = new AuditReport(tree)
+  const { report } = await auditReport.run()
+  t.strictSame(report, {})
+})

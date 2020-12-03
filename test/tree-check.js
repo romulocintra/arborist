@@ -57,36 +57,61 @@ t.test('break some stuff', t => {
   })
   const disowned = tree.children.get('disowned')
   disowned.parent = null
+
   // oops...
-  tree.inventory.add(disowned)
+  Map.prototype.set.call(tree.inventory, 'xyz', disowned)
+  t.equal(treeCheck(tree, false), tree, 'unreachable allowed')
   t.throws(() => treeCheck(tree), {
     message: 'unreachable in inventory',
-    path: '/some/path/node_modules/disowned',
+    node: '/some/path/node_modules/disowned',
     realpath: '/some/path/node_modules/disowned',
     location: '',
     name: 'Error',
   })
 
-  tree.inventory.delete(disowned)
+  Map.prototype.delete.call(tree.inventory, 'xyz')
   disowned.parent = tree
   tree.inventory.delete(disowned)
   t.throws(() => treeCheck(tree), {
     message: 'not in inventory',
-    path: '/some/path/node_modules/disowned',
-    realpath: '/some/path/node_modules/disowned',
-    location: 'node_modules/disowned',
+    node: '/some/path/node_modules/disowned',
     name: 'Error',
   })
 
-  tree.inventory.add(disowned)
   disowned.root = null
+  tree.children.set('wtf', disowned)
   t.throws(() => treeCheck(tree), {
     message: 'double root',
-    path: '/some/path/node_modules/disowned',
+    node: '/some/path/node_modules/disowned',
     realpath: '/some/path/node_modules/disowned',
     tree: tree.path,
     name: 'Error',
   })
+
+  const otherTree = new Node({
+    name: 'other',
+    parent: disowned,
+  })
+  tree.children.set('wtf', otherTree)
+  t.throws(() => treeCheck(tree), {
+    message: 'node from other root in tree',
+    node: '/some/path/node_modules/disowned/node_modules/other',
+    realpath: '/some/path/node_modules/disowned/node_modules/other',
+    tree: tree.path,
+    name: 'Error',
+  })
+
+  tree.children.delete('wtf')
+  Map.prototype.set.call(otherTree.inventory, 'othertree', disowned)
+  t.throws(() => treeCheck(otherTree), {
+    message: 'non-root has non-zero inventory',
+    node: disowned.path,
+    tree: otherTree.path,
+    inventory: [[disowned.path, disowned.location]],
+    name: 'Error',
+  })
+  Map.prototype.delete.call(tree.inventory, 'othertree')
+
   t.end()
 })
 
@@ -105,7 +130,7 @@ t.test('just return the tree if not in debug mode', t => {
   const disowned = tree.children.get('disowned')
   disowned.parent = null
   // oops...
-  tree.inventory.add(disowned)
+  Map.prototype.set.call(tree.inventory, 'xyz', disowned)
   t.equal(treeCheck(tree), tree, 'error suppressed outside of debug mode')
   t.end()
 })
