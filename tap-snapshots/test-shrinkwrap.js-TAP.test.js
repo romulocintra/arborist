@@ -3391,6 +3391,10 @@ Object {
       },
       "version": "1.0.0",
     },
+    "node_modules/.pnpm/registry.npmjs.org/@scope/x/1.0.0/node_modules/a": Object {
+      "link": true,
+      "resolved": "node_modules/.pnpm/registry.npmjs.org/a/1.0.0/node_modules/a",
+    },
     "node_modules/.pnpm/registry.npmjs.org/@scope/x/1.0.0/node_modules/b": Object {
       "link": true,
       "resolved": "node_modules/.pnpm/registry.npmjs.org/b/1.0.0/node_modules/b",
@@ -3425,6 +3429,11 @@ Object {
     "node_modules/.pnpm/registry.npmjs.org/b/1.0.0/node_modules/c": Object {
       "link": true,
       "resolved": "node_modules/.pnpm/registry.npmjs.org/c/1.0.0/node_modules/c",
+    },
+    "node_modules/.pnpm/registry.npmjs.org/c/1.0.0": Object {},
+    "node_modules/.pnpm/registry.npmjs.org/c/1.0.0/node_modules/@scope/x": Object {
+      "link": true,
+      "resolved": "node_modules/.pnpm/registry.npmjs.org/@scope/x/1.0.0/node_modules/@scope/x",
     },
     "node_modules/.pnpm/registry.npmjs.org/c/1.0.0/node_modules/c": Object {
       "dependencies": Object {
