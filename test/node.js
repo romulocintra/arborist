@@ -1960,3 +1960,14 @@ t.test('clear inventory when changing root', t => {
   t.equal(child3.root, r1)
   t.end()
 })
+
+t.test('create a node that doesnt get added to a root until later', t => {
+  const root = new Node({ path: '/path/to/root' })
+  const foo = new Node({ name: 'foo' })
+  t.equal(foo.root, foo, 'other is self-rooted at first')
+  t.equal(foo.path, null, 'foo has null path')
+  foo.parent = root
+  t.equal(foo.root, root, 'foo is rooted on root after parent assignment')
+  t.equal(normalizePath(foo.path), normalizePath('/path/to/root/node_modules/foo'), 'foo has updated path')
+  t.end()
+})
