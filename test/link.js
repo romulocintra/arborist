@@ -3,6 +3,7 @@ const Link = require('../lib/link.js')
 const Node = require('../lib/node.js')
 const Shrinkwrap = require('../lib/shrinkwrap.js')
 
+const { resolve } = require('path')
 const normalizePath = path => path.replace(/^[A-Z]:/, '').replace(/\\/g, '/')
 const normalizePaths = obj => {
   obj.path = obj.path && normalizePath(obj.path)
@@ -167,6 +168,38 @@ t.test('get root from various places', t => {
     t.equal(fromParent.target.parent, null)
     t.end()
   })
+
+  t.end()
+})
+
+t.test('temporary link node pending attachment to a tree', t => {
+  const root = new Node({ path: '/path/to/node' })
+  const link = new Link({ name: 'foo', realpath: '/this/will/change' })
+  const target = new Node({ path: '/path/to/node/foo' })
+  t.equal(link.root, link)
+  t.equal(target.root, target)
+  t.equal(normalizePath(link.realpath), normalizePath('/this/will/change'))
+  link.target = target
+  t.equal(target.root, link)
+  t.equal(link.realpath, target.path)
+  t.equal(link.path, null)
+  link.parent = root
+  t.equal(normalizePath(link.realpath), normalizePath(target.path))
+  t.equal(normalizePath(link.path), normalizePath(root.path + '/node_modules/foo'))
+  t.equal(link.root, root)
+  t.equal(target.root, root)
+  t.equal(target.fsParent, root)
+
+  const link2 = new Link({ name: 'bar', realpath: '/this/will/change' })
+  const target2 = new Node({ name: 'bar' })
+  link2.target = target2
+  t.equal(normalizePath(target2.path), normalizePath('/this/will/change'))
+  link2.target = null
+  target2.realpath = target2.path = resolve('/path/to/node/bar')
+  link2.target = target2
+  t.equal(normalizePath(link2.realpath), normalizePath(target2.path))
+  link2.parent = root
+  t.equal(target2.fsParent, root)
 
   t.end()
 })
