@@ -320,7 +320,7 @@ Node {
       "resolved": "file:../target",
       "target": Object {
         "name": "target",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
@@ -957,7 +957,7 @@ Node {
       "resolved": "file:../target",
       "target": Object {
         "name": "target",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
@@ -1506,7 +1506,7 @@ Node {
       "resolved": "file:../target",
       "target": Object {
         "name": "target",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
@@ -1632,7 +1632,7 @@ Node {
           "resolved": "file:../target",
           "target": Object {
             "name": "target",
-            "parent": undefined,
+            "parent": null,
           },
         },
       },
@@ -1714,7 +1714,7 @@ Node {
       "resolved": "file:../app",
       "target": Object {
         "name": "app",
-        "parent": undefined,
+        "parent": null,
       },
     },
     "lib" => Link {
@@ -1731,7 +1731,7 @@ Node {
       "resolved": "file:../lib",
       "target": Object {
         "name": "lib",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
@@ -27943,7 +27943,7 @@ Node {
       "resolved": "file:../a",
       "target": Object {
         "name": "a",
-        "parent": undefined,
+        "parent": null,
       },
     },
     "b" => Link {
@@ -27960,7 +27960,7 @@ Node {
       "resolved": "file:../b",
       "target": Object {
         "name": "b",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
@@ -45778,7 +45778,7 @@ Node {
       "resolved": "file:../a",
       "target": Object {
         "name": "a",
-        "parent": undefined,
+        "parent": null,
       },
     },
   },
