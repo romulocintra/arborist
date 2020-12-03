@@ -1971,3 +1971,20 @@ t.test('create a node that doesnt get added to a root until later', t => {
   t.equal(normalizePath(foo.path), normalizePath('/path/to/root/node_modules/foo'), 'foo has updated path')
   t.end()
 })
+
+t.test('changing path to a node_modules folder sets name if necessary', t => {
+  const node = new Node({
+    path: '/some/random/path',
+  })
+  t.equal(node.name, 'path')
+  const _changePath = Symbol.for('_changePath')
+  node[_changePath]('/path/to/node_modules/foo')
+  t.equal(node.name, 'foo')
+  node[_changePath]('/path/to/node_modules/foo/node_modules/bar')
+  t.equal(node.name, 'bar')
+  node[_changePath]('/path/to/node_modules/foo/node_modules/@bar/baz/node_modules')
+  t.equal(node.name, 'bar')
+  node[_changePath]('/path/to/node_modules/foo/node_modules/@bar/baz')
+  t.equal(node.name, '@bar/baz')
+  t.end()
+})
