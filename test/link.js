@@ -203,3 +203,20 @@ t.test('temporary link node pending attachment to a tree', t => {
 
   t.end()
 })
+
+t.test('link gets version from target', t => {
+  const link = new Link({ realpath: '/some/real/path', path: '/other/path' })
+  t.equal(link.version, '')
+  link.target = null
+  link.package = {name: 'bar', version: '2.3.4' }
+  t.equal(link.version, '2.3.4')
+  link.package = {}
+  t.equal(link.version, '')
+  const target = new Node({
+    pkg: { name: 'foo', version: '1.2.3' },
+    path: '/some/real/path',
+    root: link,
+  })
+  t.equal(link.version, '1.2.3')
+  t.end()
+})
