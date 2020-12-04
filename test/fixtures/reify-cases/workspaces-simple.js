@@ -16,6 +16,10 @@ module.exports = t => {
       "version": "1.0.0"
     })
   },
+  "node_modules": {
+    "a": t.fixture('symlink', "../a"),
+    "b": t.fixture('symlink', "../b")
+  },
   "package.json": JSON.stringify({
     "name": "workspace-simple",
     "workspaces": [
