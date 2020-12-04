@@ -5,6 +5,7 @@ const treeCheck = requireInject('../lib/tree-check.js', {
 })
 
 const t = require('tap')
+const { resolve } = require('path')
 
 const Node = require('../lib/node.js')
 const Link = require('../lib/link.js')
@@ -63,8 +64,8 @@ t.test('break some stuff', t => {
   t.equal(treeCheck(tree, false), tree, 'unreachable allowed')
   t.throws(() => treeCheck(tree), {
     message: 'unreachable in inventory',
-    node: '/some/path/node_modules/disowned',
-    realpath: '/some/path/node_modules/disowned',
+    node: resolve('/some/path/node_modules/disowned'),
+    realpath: resolve('/some/path/node_modules/disowned'),
     location: '',
     name: 'Error',
   })
@@ -74,7 +75,7 @@ t.test('break some stuff', t => {
   tree.inventory.delete(disowned)
   t.throws(() => treeCheck(tree), {
     message: 'not in inventory',
-    node: '/some/path/node_modules/disowned',
+    node: resolve('/some/path/node_modules/disowned'),
     name: 'Error',
   })
 
@@ -82,8 +83,8 @@ t.test('break some stuff', t => {
   tree.children.set('wtf', disowned)
   t.throws(() => treeCheck(tree), {
     message: 'double root',
-    node: '/some/path/node_modules/disowned',
-    realpath: '/some/path/node_modules/disowned',
+    node: resolve('/some/path/node_modules/disowned'),
+    realpath: resolve('/some/path/node_modules/disowned'),
     tree: tree.path,
     name: 'Error',
   })
@@ -95,8 +96,8 @@ t.test('break some stuff', t => {
   tree.children.set('wtf', otherTree)
   t.throws(() => treeCheck(tree), {
     message: 'node from other root in tree',
-    node: '/some/path/node_modules/disowned/node_modules/other',
-    realpath: '/some/path/node_modules/disowned/node_modules/other',
+    node: resolve('/some/path/node_modules/disowned/node_modules/other'),
+    realpath: resolve('/some/path/node_modules/disowned/node_modules/other'),
     tree: tree.path,
     name: 'Error',
   })

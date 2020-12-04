@@ -848,7 +848,7 @@ t.test('move fsChildren when moving to a new fsParent in same root', t => {
   })
   t.equal(c2.fsParent, p2)
   p2.fsParent = p1
-  t.equal(c2.path, normalizePath('/path/to/root/p1/p2/c2'))
+  t.equal(normalizePath(c2.path), normalizePath('/path/to/root/p1/p2/c2'))
   t.end()
 })
 
