@@ -9,6 +9,7 @@ const { resolve } = require('path')
 
 const Node = require('../lib/node.js')
 const Link = require('../lib/link.js')
+const Edge = require('../lib/edge.js')
 
 t.test('basic tree that is a-ok', t => {
   const tree = new Node({
@@ -133,5 +134,32 @@ t.test('just return the tree if not in debug mode', t => {
   // oops...
   Map.prototype.set.call(tree.inventory, 'xyz', disowned)
   t.equal(treeCheck(tree), tree, 'error suppressed outside of debug mode')
+  t.end()
+})
+
+t.test('tree with dev edges on a nested dep node', t => {
+  const tree = new Node({
+    path: '/some/path',
+    pkg: {},
+    children: [
+      { pkg: { name: 'foo', version: '1.2.3', devDependencies: { x: '' }}},
+    ],
+  })
+  // ensure it actually gets added
+  new Edge({
+    type: 'dev',
+    name: 'x',
+    spec: '',
+    from: tree.children.get('foo'),
+  })
+  t.throws(() => treeCheck(tree), {
+    message: 'dev edges on non-top node',
+    node: tree.children.get('foo').path,
+    tree: tree.path,
+    root: tree.root.path,
+    via: tree.path,
+    viaType: 'children',
+    devEdges: [['dev', 'x', '', 'MISSING']],
+  })
   t.end()
 })
